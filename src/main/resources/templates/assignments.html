@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="bg">
+<head>
+    <meta charset="UTF-8">
+    <title>Заявления</title>
+    <style>
+        /* Основни цветове */
+        :root {
+            --blue-dark: #0d3b66;
+            --blue: #1e81b0;
+            --blue-light: #5ea9dd;
+            --blue-lighter: #d0e7f9;
+            --btn-hover: #155d8b;
+            --btn-reject-bg: #d9534f;
+            --btn-reject-hover: #b43c3a;
+            --text-dark: #042a4f;
+            --bg: #f5faff;
+        }
+
+        body {
+            background-color: var(--bg);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color: var(--text-dark);
+            margin: 20px;
+        }
+
+        .container {
+            max-width: 960px;
+            margin: auto;
+            background: white;
+            padding: 25px 30px;
+            border-radius: 12px;
+            box-shadow: 0 8px 25px rgba(14, 56, 101, 0.2);
+        }
+
+        h2 {
+            color: var(--blue-dark);
+            font-weight: 700;
+            margin-bottom: 25px;
+        }
+
+        h4 {
+            color: var(--blue);
+            font-weight: 600;
+            margin-top: 30px;
+            margin-bottom: 15px;
+        }
+
+        p {
+            font-size: 1.05rem;
+            line-height: 1.4;
+            margin: 8px 0;
+        }
+
+        .btn {
+            display: inline-block;
+            background: linear-gradient(135deg, var(--blue), var(--blue-light));
+            color: white;
+            padding: 10px 22px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 600;
+            box-shadow: 0 4px 10px rgba(30, 129, 176, 0.4);
+            transition: background 0.3s ease, box-shadow 0.3s ease;
+            cursor: pointer;
+            border: none;
+            font-size: 1rem;
+            user-select: none;
+            text-align: center;
+        }
+
+        .btn:hover,
+        .btn:focus {
+            background: var(--btn-hover);
+            box-shadow: 0 6px 18px rgba(21, 93, 139, 0.6);
+        }
+
+        .btn-reject {
+            background: var(--btn-reject-bg);
+            box-shadow: 0 4px 10px rgba(217, 83, 79, 0.4);
+            margin-left: 0;
+        }
+
+        .btn-reject:hover,
+        .btn-reject:focus {
+            background: var(--btn-reject-hover);
+            box-shadow: 0 6px 18px rgba(180, 60, 58, 0.6);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0 12px;
+            margin-top: 15px;
+            table-layout: fixed;
+            word-wrap: break-word;
+        }
+
+        thead tr {
+            background: var(--blue-light);
+            color: var(--blue-dark);
+            font-weight: 700;
+            text-align: left;
+            border-radius: 12px;
+        }
+
+        thead th {
+            padding: 12px 18px;
+            font-size: 0.95rem;
+            overflow-wrap: break-word;
+            word-break: break-word;
+        }
+
+        tbody tr {
+            background: white;
+            box-shadow: 0 3px 10px rgba(14, 56, 101, 0.1);
+            border-radius: 12px;
+            transition: transform 0.2s ease;
+        }
+
+        tbody tr:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(14, 56, 101, 0.18);
+        }
+
+        tbody td {
+            padding: 14px 18px;
+            font-size: 0.9rem;
+            vertical-align: middle;
+            white-space: normal;
+            overflow-wrap: break-word;
+            word-break: break-word;
+        }
+
+        tbody td:nth-child(2),
+        tbody td:nth-child(3),
+        tbody td:nth-child(4),
+        tbody td:nth-child(5) {
+            max-width: 150px;
+        }
+
+        td > form {
+            display: inline-block;
+            margin-right: 8px;
+            margin-bottom: 0;
+        }
+
+        form button.btn {
+            width: 110px;
+            height: 40px;
+            padding: 0;
+            box-sizing: border-box;
+            white-space: nowrap;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-weight: 600;
+        }
+
+        /* Стилове за неактивни бутони */
+        .btn:disabled,
+        .btn-reject:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            background: #cccccc;
+            box-shadow: none;
+        }
+
+        .btn:disabled:hover,
+        .btn-reject:disabled:hover {
+            background: #cccccc;
+            box-shadow: none;
+            transform: none;
+        }
+
+    </style>
+</head>
+<body>
+<div class="container" th:object="${assignment}">
+    <h2 th:text="'Добре дошъл, ' + ${user.firstName}"></h2>
+
+    <a href="/" class="btn">Начало</a>
+
+    <a th:href="@{assignments/approval}" class="btn">Преглед на одобрения от катедрата</a>
+
+
+    <div th:if="${isStudent}">
+        <div th:if="${assignment == null}">
+            <p>Все още не си подал заявка.</p>
+            <a href="/assignments/propose" class="btn">Генерирай заявка</a>
+        </div>
+        <div th:if="${assignment != null}">
+            <h4>Твоята заявка:</h4>
+            <p><b>Тема:</b> <span th:text="${assignment.topic}"></span></p>
+            <p><b>Ръководител:</b> <span
+                    th:text="${assignment.supervisor.user.firstName + ' ' + assignment.supervisor.user.lastName}"></span>
+            </p>
+            <p><b>Одобрена:</b> <span th:text="${assignment.approved ? 'Да' : 'Не'}"></span></p>
+        </div>
+    </div>
+
+
+    <div th:if="${isTeacher}">
+        <h4>Заявки, в които си ръководител</h4>
+        <table>
+            <thead>
+            <tr>
+                <th>Студент</th>
+                <th>Тема</th>
+                <th>Цел</th>
+                <th>Задачи</th>
+                <th>Технологии</th>
+                <th>Одобрена</th>
+                <th>Действия</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="a : ${assignments}">
+                <td th:text="${a.student.user.firstName + ' ' + a.student.user.lastName}"></td>
+                <td th:text="${a.topic}"></td>
+                <td th:text="${a.goal}"></td>
+                <td th:text="${a.tasks}"></td>
+                <td th:text="${a.technologies}"></td>
+                <td th:text="${a.approved ? 'Да' : 'Не'}"></td>
+                <td>
+                    <form th:action="@{/assignments}" method="post">
+                        <input type="hidden" name="assignmentId" th:value="${a.id}"/>
+                        <input type="hidden" name="action" value="approve"/>
+                        <button type="submit" class="btn" th:disabled="${a.approved}">Одобри</button>
+                    </form>
+                    <form th:action="@{/assignments}" method="post">
+                        <input type="hidden" name="assignmentId" th:value="${a.id}"/>
+                        <input type="hidden" name="action" value="reject"/>
+                        <button type="submit" class="btn btn-reject" th:disabled="${!a.approved} or ${a.departmentApproved}">Откажи</button>
+                    </form>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+</body>
+</html>

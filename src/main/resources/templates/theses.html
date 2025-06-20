@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="bg" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <title>Дипломиране</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f0f4f8;
+            color: #333;
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 30px auto;
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 12px rgb(0 0 0 / 0.1);
+        }
+
+        h2 {
+            color: #0056b3;
+            margin-bottom: 20px;
+        }
+
+        a.btn {
+            background-color: #0056b3;
+            color: white;
+            padding: 8px 16px;
+            text-decoration: none;
+            border-radius: 4px;
+            margin-bottom: 20px;
+            display: inline-block;
+        }
+
+        a.btn:hover {
+            background-color: #003d80;
+        }
+
+        label {
+            display: block;
+            margin-top: 15px;
+            font-weight: 600;
+        }
+
+        input[type="text"], input[type="file"] {
+            width: 100%;
+            padding: 8px 12px;
+            margin-top: 5px;
+            border-radius: 4px;
+            border: 1px solid #ccc;
+            box-sizing: border-box;
+        }
+
+        button[type="submit"] {
+            margin-top: 20px;
+            background-color: #007bff;
+            color: white;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1rem;
+        }
+
+        button[type="submit"]:hover {
+            background-color: #0056b3;
+        }
+
+        p {
+            margin-top: 15px;
+            font-size: 0.9rem;
+        }
+
+        .teacher-section table,
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+            table-layout: fixed;
+        }
+
+        th, td {
+            border: 1px solid #ddd;
+            padding: 10px;
+            text-align: left;
+            word-break: break-word;
+        }
+
+        th {
+            background-color: #0056b3;
+            color: white;
+        }
+
+        .success-message {
+            color: green;
+            margin-top: 10px;
+        }
+
+        .error-message {
+            color: red;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h2 th:text="'Добре дошъл, ' + ${user.firstName} + '!'"></h2>
+
+    <a href="/" class="btn">Начало</a>
+
+    <!-- За студенти -->
+    <div th:if="${isStudent}">
+        <div th:if="${assignment == null or !assignment.departmentApproved or !assignment.approved}">
+            <p>Първо трябва да създадеш заявление за дипломна работа и то да бъде одобрено!</p>
+        </div>
+
+        <div th:if="${assignment != null and assignment.departmentApproved and assignment.approved}">
+
+            <div th:if="${!hasThesis}">
+                <h3>Качване на дипломна работа</h3>
+                <form action="/theses/upload" method="post" enctype="multipart/form-data" th:object="${thesis}">
+                    <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+                    <label>Заглавие:</label>
+                    <input type="text" name="title" required>
+                    <label>Файл:</label>
+                    <input type="file" name="file"
+                           accept=".pdf,.doc,.docx,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+                           required>
+                    <p>Позволени формати: .pdf, .doc, .docx</p>
+                    <button type="submit">Качи</button>
+                </form>
+            </div>
+
+            <div th:if="${hasThesis and thesis.review == null}">
+                <p style="color: green;">Очаквай рецензия скоро!</p>
+            </div>
+
+            <div th:if="${hasThesis and thesis.review != null}">
+                <table>
+                    <thead>
+                    <tr>
+                        <th>Коментар</th>
+                        <th>Дата на качване</th>
+                        <th>Дата на рецензия</th>
+                        <th>Решение</th>
+                        <th>Рецензент</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr>
+                        <td th:text="${thesis.review.text}"></td>
+                        <td th:text="${#temporals.format(thesis.uploadDate, 'dd.MM.yyyy')}"></td>
+                        <td th:text="${#temporals.format(thesis.review.uploadDate, 'dd.MM.yyyy')}"></td>
+                        <td th:text="${thesis.review.positive ? 'Положителна' : 'Отрицателна'}"></td>
+                        <td th:text="${thesis.review.reviewer.user.firstName + ' ' + thesis.review.reviewer.user.lastName}"></td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- За преподаватели -->
+    <div th:if="${isTeacher}" class="teacher-section">
+        <h3>Студенти от твоя департамент с качени дипломни работи</h3>
+
+        <div th:if="${#lists.isEmpty(thesesFromDepartment)}">
+            <p style="text-align: center;">Няма качени дипломни работи в твоя департамент.</p>
+        </div>
+
+        <table th:if="${!#lists.isEmpty(thesesFromDepartment)}">
+            <thead>
+            <tr>
+                <th>Студент</th>
+                <th>Тема</th>
+                <th>Дата на качване</th>
+                <th>Дата на рецензия</th>
+                <th>Файл</th>
+                <th>Рецензия</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="thesis : ${thesesFromDepartment}">
+                <td th:text="${thesis.assignment.student.user.firstName + ' ' + thesis.assignment.student.user.lastName}"></td>
+                <td th:text="${thesis.title}"></td>
+                <td th:text="${#temporals.format(thesis.uploadDate, 'dd.MM.yyyy')}"></td>
+                <td>
+                    <span th:if="${thesis.review != null}" th:text="${#temporals.format(thesis.review.uploadDate, 'dd.MM.yyyy')}"></span>
+                </td>
+                <td>
+                    <a th:href="@{/theses/download(path=${#strings.substring(thesis.filePath, thesis.filePath.lastIndexOf('/') + 1)})}"
+                       th:text="${#strings.substring(thesis.filePath, thesis.filePath.lastIndexOf('/') + 1)}"
+                       class="btn">Изтегли файл</a>
+                </td>
+                <td>
+                    <span th:if="${thesis.review != null}"
+                          th:text="${thesis.review.positive ? 'Положителна' : 'Отрицателна'}"></span>
+                    <a th:if="${thesis.review == null}" th:href="@{/theses/reviews(thesisId=${thesis.id})}" class="btn"
+                       style="padding: 4px 10px; font-size: 0.9rem;">Рецензирай</a>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+
+
+        <div th:if="${success}" class="success-message" th:text="${success}"></div>
+        <div th:if="${error}" class="error-message" th:text="${error}"></div>
+    </div>
+</div>
+</body>
+</html>

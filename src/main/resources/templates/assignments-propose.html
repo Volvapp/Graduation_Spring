@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="bg" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8" />
+    <title>Генерирай заявка</title>
+    <style>
+        body {
+            background: #e3f2fd;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color: #0d47a1;
+            margin: 0;
+            padding: 2rem;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            min-height: 100vh;
+        }
+        .form-container {
+            background: #ffffff;
+            border-radius: 12px;
+            box-shadow: 0 8px 20px rgba(13, 71, 161, 0.15);
+            padding: 2.5rem 3rem;
+            max-width: 480px;
+            width: 100%;
+        }
+        h2 {
+            margin-bottom: 1.8rem;
+            font-weight: 700;
+            font-size: 1.8rem;
+            color: #1565c0;
+            text-align: center;
+        }
+        form > div {
+            margin-bottom: 1.4rem;
+            display: flex;
+            flex-direction: column;
+        }
+        label {
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            font-size: 1rem;
+            color: #1976d2;
+        }
+        input[type="text"],
+        textarea,
+        select {
+            padding: 0.6rem 1rem;
+            font-size: 1rem;
+            border: 2px solid #90caf9;
+            border-radius: 8px;
+            transition: border-color 0.3s ease;
+            background-color: #e3f2fd;
+            color: #0d47a1;
+            resize: vertical;
+            min-height: 38px;
+        }
+        input[type="text"]:focus,
+        textarea:focus,
+        select:focus {
+            outline: none;
+            border-color: #1565c0;
+            background-color: #bbdefb;
+        }
+        textarea {
+            min-height: 80px;
+        }
+        .btn-submit {
+            margin-top: 1.6rem;
+            width: 100%;
+            background: linear-gradient(135deg, #1565c0, #42a5f5);
+            border: none;
+            color: white;
+            font-weight: 700;
+            font-size: 1.1rem;
+            padding: 0.75rem 0;
+            border-radius: 10px;
+            cursor: pointer;
+            box-shadow: 0 5px 15px rgba(21, 101, 192, 0.4);
+            transition: background 0.3s ease;
+        }
+        .btn-submit:hover {
+            background: linear-gradient(135deg, #0d47a1, #2196f3);
+        }
+        .error-message {
+            color: #ac5555;
+            font-size: 0.9rem;
+            margin-top: 0.25rem;
+        }
+    </style>
+</head>
+<body>
+<div class="form-container">
+    <h2>Генерирай своята заявка</h2>
+    <form th:action="@{/assignments/propose}" th:object="${assignmentForm}" method="post">
+
+        <div>
+            <label for="topic">Тема</label>
+            <input type="text" id="topic" th:field="*{topic}" placeholder="Въведи тема" />
+            <p class="error-message" th:if="${#fields.hasErrors('topic')}" th:errors="*{topic}"></p>
+        </div>
+
+        <div>
+            <label for="goal">Цел</label>
+            <textarea id="goal" th:field="*{goal}" placeholder="Опиши целта"></textarea>
+            <p class="error-message" th:if="${#fields.hasErrors('goal')}" th:errors="*{goal}"></p>
+        </div>
+
+        <div>
+            <label for="tasks">Задачи</label>
+            <textarea id="tasks" th:field="*{tasks}" placeholder="Опиши задачите"></textarea>
+            <p class="error-message" th:if="${#fields.hasErrors('tasks')}" th:errors="*{tasks}"></p>
+        </div>
+
+        <div>
+            <label for="technologies">Технологии</label>
+            <input type="text" id="technologies" th:field="*{technologies}" placeholder="Използвани технологии" />
+            <p class="error-message" th:if="${#fields.hasErrors('technologies')}" th:errors="*{technologies}"></p>
+        </div>
+
+        <div>
+            <label for="supervisor">Ръководител</label>
+            <select id="supervisor" th:field="*{supervisorId}">
+                <option value="" disabled th:selected="*{supervisorId} == null">Избери ръководител</option>
+                <option th:each="teacher : ${teachers}"
+                        th:value="${teacher.id}"
+                        th:text="${teacher.user.firstName + ' ' + teacher.user.lastName}">
+                </option>
+            </select>
+            <p class="error-message" th:if="${#fields.hasErrors('supervisorId')}" th:errors="*{supervisorId}"></p>
+        </div>
+
+        <button type="submit" class="btn-submit">Изпрати заявка</button>
+    </form>
+</div>
+</body>
+</html>

@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="bg" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8" />
+    <title>Създаване на рецензия</title>
+    <style>
+        body {
+            background-color: #e0f2fe;
+            font-family: 'Segoe UI', sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 1rem;
+        }
+
+        .form-container {
+            background-color: #ffffff;
+            border-radius: 1rem;
+            padding: 2rem;
+            max-width: 600px;
+            width: 100%;
+            box-shadow: 0 8px 24px rgba(59, 130, 246, 0.2);
+        }
+
+        h1 {
+            text-align: center;
+            color: #1e3a8a;
+            margin-bottom: 1.5rem;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: #1e40af;
+            font-weight: 600;
+        }
+
+        textarea {
+            width: 100%;
+            height: 150px;
+            padding: 0.75rem;
+            font-size: 1rem;
+            border: 1px solid #93c5fd;
+            border-radius: 0.5rem;
+            resize: vertical;
+            margin-bottom: 1.25rem;
+        }
+
+        .radio-group {
+            display: flex;
+            gap: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .radio-option {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: #1d4ed8;
+        }
+
+        button {
+            background-color: #2563eb;
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 0.5rem;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            width: 100%;
+            transition: background-color 0.2s ease;
+        }
+
+        button:hover {
+            background-color: #1e40af;
+        }
+    </style>
+</head>
+<body>
+<div class="form-container">
+    <h1>Създай рецензия</h1>
+    <form th:action="@{/theses/reviews}" method="post">
+        <input type="hidden" name="thesisId" th:value="${thesis.id}" />
+
+        <label for="text">Текст на рецензията</label>
+        <textarea id="text" name="text" required></textarea>
+
+        <label>Оценка</label>
+        <div class="radio-group">
+            <label class="radio-option">
+                <input type="radio" name="positive" value="true" required />
+                Положителна
+            </label>
+            <label class="radio-option">
+                <input type="radio" name="positive" value="false" />
+                Отрицателна
+            </label>
+        </div>
+
+        <button type="submit">Запиши рецензията</button>
+    </form>
+
+</div>
+</body>
+</html>

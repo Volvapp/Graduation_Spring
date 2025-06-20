@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="bg">
+<head>
+    <meta charset="UTF-8" />
+    <title>Справки</title>
+    <style>
+        body {
+            font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f9fbfd;
+            color: #1a202c;
+            margin: 20px;
+            line-height: 1.6;
+        }
+
+        h1 {
+            color: #1e40af;
+            margin-bottom: 30px;
+            font-weight: 700;
+            font-size: 2.5rem;
+        }
+
+        h2 {
+            margin-top: 40px;
+            margin-bottom: 20px;
+            color: #2563eb;
+            border-bottom: 2px solid #60a5fa;
+            padding-bottom: 6px;
+            font-weight: 600;
+        }
+
+        nav {
+            margin-bottom: 30px;
+        }
+
+        nav a {
+            margin-right: 20px;
+            text-decoration: none;
+            color: #3b82f6;
+            font-weight: 500;
+            transition: color 0.3s ease;
+        }
+
+        nav a:hover,
+        nav a:focus {
+            color: #1d4ed8;
+            text-decoration: underline;
+            outline: none;
+        }
+
+        table {
+            border-collapse: separate;
+            border-spacing: 0 10px;
+            width: 100%;
+            box-shadow: 0 2px 8px rgb(0 0 0 / 0.1);
+            background-color: #fff;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        thead tr {
+            background-color: #2563eb;
+            color: white;
+            text-align: left;
+            font-weight: 600;
+            font-size: 0.95rem;
+        }
+
+        thead th {
+            padding: 12px 15px;
+        }
+
+        tbody tr {
+            background-color: #f3f4f6;
+            transition: background-color 0.2s ease;
+        }
+
+        tbody tr:nth-child(even) {
+            background-color: #e0e7ff;
+        }
+
+        tbody tr:hover {
+            background-color: #bfdbfe;
+        }
+
+        tbody td {
+            padding: 12px 15px;
+            font-size: 0.9rem;
+            color: #1e293b;
+        }
+
+        form {
+            margin-bottom: 25px;
+            background: #e0e7ff;
+            padding: 15px 20px;
+            border-radius: 8px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            align-items: center;
+            max-width: 600px;
+        }
+
+        label {
+            font-weight: 600;
+            color: #1e40af;
+            min-width: 120px;
+        }
+
+        input[type="text"],
+        input[type="number"],
+        input[type="date"] {
+            padding: 8px 12px;
+            border: 1.5px solid #93c5fd;
+            border-radius: 6px;
+            font-size: 1rem;
+            flex-grow: 1;
+            transition: border-color 0.3s ease;
+        }
+
+        input[type="text"]:focus,
+        input[type="number"]:focus,
+        input[type="date"]:focus {
+            border-color: #2563eb;
+            outline: none;
+        }
+
+        button {
+            background-color: #2563eb;
+            color: white;
+            border: none;
+            padding: 10px 22px;
+            border-radius: 6px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            flex-shrink: 0;
+        }
+
+        button:hover,
+        button:focus {
+            background-color: #1d4ed8;
+            outline: none;
+        }
+
+        p {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #1e40af;
+            margin-top: 10px;
+        }
+
+        hr {
+            border: none;
+            border-top: 1.5px solid #93c5fd;
+            margin: 40px 0;
+            width: 100%;
+        }
+    </style>
+</head>
+<body>
+
+<h1>Справки</h1>
+<div th:if="${error}" style="background-color:#fee2e2; color:#b91c1c; padding:12px 20px; border-radius:8px; font-weight:600; margin-bottom:20px;">
+    <p th:text="${error}"></p>
+</div>
+
+<nav>
+    <a th:href="@{/}">Начало</a>
+    <a th:href="@{/reports/approved}">Одобрени задания</a>
+    <a th:href="@{/reports/by-title(keyword='тема')}">Търсене по заглавие</a>
+    <a th:href="@{/reports/approved-by-supervisor(supervisorId=1)}">Одобрени по ръководител</a>
+    <a th:href="@{/reports/graduated(from='2024-01-01',to='2024-06-01')}">Випускници</a>
+    <a th:href="@{/reports/negative-count}">Негативни ревюта</a>
+    <a th:href="@{/reports/average-defended(from='2024-01-01',to='2024-06-01')}">Средно защитили се</a>
+    <a th:href="@{/reports/successful-by-supervisor(supervisorId=1)}">Успешни по ръководител</a>
+</nav>
+
+<hr/>
+
+<div th:if="${approvedAssignments != null}">
+    <h2>Одобрени задания</h2>
+    <table>
+        <thead>
+        <tr>
+            <th>Заглавие</th>
+            <th>Студент</th>
+            <th>Ръководител</th>
+            <th>Задачи</th>
+            <th>Технологии</th>
+            <th>Цел</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="assignment : ${approvedAssignments}">
+            <td th:text="${assignment.topic}">Заглавие</td>
+            <td th:text="${assignment.student.user.firstName + ' ' + assignment.student.user.lastName}">Студент</td>
+            <td th:text="${assignment.supervisor.user.firstName + ' ' + assignment.supervisor.user.lastName}">Ръководител</td>
+            <td th:text="${assignment.tasks}">Задачи</td>
+            <td th:text="${assignment.technologies}">Технологии</td>
+            <td th:text="${assignment.goal}">Цел</td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+
+<div th:if="${assignmentsByTitle != null}">
+    <h2>Търсене по заглавие</h2>
+    <form th:action="@{/reports/by-title}" method="get">
+        <label for="keyword">Ключова дума:</label>
+        <input type="text" id="keyword" name="keyword" required />
+        <button type="submit">Търси</button>
+    </form>
+
+    <div th:if="${assignmentsByTitle != null}">
+        <h3>Резултати</h3>
+        <table>
+            <thead>
+            <tr>
+                <th>Заглавие</th>
+                <th>Студент</th>
+                <th>Ръководител</th>
+                <th>Задачи</th>
+                <th>Технологии</th>
+                <th>Цел</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="assignment : ${assignmentsByTitle}">
+                <td th:text="${assignment.topic}">Заглавие</td>
+                <td th:text="${assignment.student.user.firstName + ' ' + assignment.student.user.lastName}">Студент</td>
+                <td th:text="${assignment.supervisor.user.firstName + ' ' + assignment.supervisor.user.lastName}">Ръководител</td>
+                <td th:text="${assignment.tasks}">Задачи</td>
+                <td th:text="${assignment.technologies}">Технологии</td>
+                <td th:text="${assignment.goal}">Цел</td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<div th:if="${approvedAssignmentsBySupervisor != null}">
+    <h2>Одобрени задания по ръководител</h2>
+    <form th:action="@{/reports/approved-by-supervisor}" method="get">
+        <label for="supervisorId">ID на ръководител:</label>
+        <input type="number" id="supervisorId" name="supervisorId" required />
+        <button type="submit">Покажи</button>
+    </form>
+
+    <table>
+        <thead>
+        <tr>
+            <th>Заглавие</th>
+            <th>Студент</th>
+            <th>Ръководител</th>
+            <th>Задачи</th>
+            <th>Технологии</th>
+            <th>Цел</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="assignment : ${approvedAssignmentsBySupervisor}">
+            <td th:text="${assignment.topic}">Заглавие</td>
+            <td th:text="${assignment.student.user.firstName + ' ' + assignment.student.user.lastName}">Студент</td>
+            <td th:text="${assignment.supervisor.user.firstName + ' ' + assignment.supervisor.user.lastName}">Ръководител</td>
+            <td th:text="${assignment.tasks}">Задачи</td>
+            <td th:text="${assignment.technologies}">Технологии</td>
+            <td th:text="${assignment.goal}">Цел</td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+
+<div th:if="${graduatedStudentsInPeriod != null}">
+    <h2>Випускници в период</h2>
+    <form th:action="@{/reports/graduated}" method="get">
+        <label for="from">От дата:</label>
+        <input type="date" id="from" name="from" required />
+        <label for="to">До дата:</label>
+        <input type="date" id="to" name="to" required />
+        <button type="submit">Покажи</button>
+    </form>
+    <table>
+        <thead>
+        <tr>
+            <th>Име</th>
+            <th>Факултетен номер</th>
+            <th>Дата на дипломиране</th>
+            <th>Оценка</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="student : ${graduatedStudentsInPeriod}">
+            <td th:text="${student.user.firstName + ' ' + student.user.lastName}"></td>
+            <td th:text="${student.facultyNumber}"></td>
+            <td th:text="${student.defense.defenseDate}"></td>
+            <td th:text="${student.grade}"></td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+
+<div th:if="${negativeReviewsCount != null}">
+    <h2>Брой негативни ревюта</h2>
+    <p th:text="${negativeReviewsCount}"></p>
+</div>
+
+<div th:if="${averageStudentsDefended != null}">
+    <h2>Средно защитили се студенти в период</h2>
+    <form th:action="@{/reports/average-defended}" method="get">
+        <label for="from">От дата:</label>
+        <input type="date" id="from" name="from" required />
+        <label for="to">До дата:</label>
+        <input type="date" id="to" name="to" required />
+        <button type="submit">Покажи</button>
+    </form>
+
+    <p th:text="'Средно защитили се: ' + ${averageStudentsDefended}"></p>
+</div>
+
+<div th:if="${successfulStudentsBySupervisor != null}">
+    <h2>Успешни студенти по ръководител</h2>
+    <form th:action="@{/reports/successful-by-supervisor}" method="get">
+        <label for="supervisorId">ID на ръководител:</label>
+        <input type="number" id="supervisorId" name="supervisorId" required />
+        <button type="submit">Покажи</button>
+    </form>
+    <p th:text="${successfulStudentsBySupervisor}"></p>
+</div>
+
+</body>
+</html>

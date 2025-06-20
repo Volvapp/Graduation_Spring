@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="bg">
+<head>
+    <meta charset="UTF-8">
+    <title>Одобрения по катедра</title>
+    <style>
+        :root {
+            --blue-dark: #0d3b66;
+            --blue: #1e81b0;
+            --blue-light: #5ea9dd;
+            --blue-lighter: #d0e7f9;
+            --btn-hover: #155d8b;
+            --text-dark: #042a4f;
+            --bg: #f5faff;
+            --reject: #dc3545;
+            --reject-hover: #bb2d3b;
+        }
+
+        body {
+            background-color: var(--bg);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color: var(--text-dark);
+            margin: 20px;
+        }
+
+        .container {
+            max-width: 970px;
+            margin: auto;
+            background: white;
+            padding: 25px 30px;
+            border-radius: 12px;
+            box-shadow: 0 8px 25px rgba(14, 56, 101, 0.2);
+        }
+
+        h2 {
+            color: var(--blue-dark);
+            font-weight: 700;
+            margin-bottom: 25px;
+        }
+
+        .btn {
+            display: inline-block;
+            background: linear-gradient(135deg, var(--blue), var(--blue-light));
+            color: white;
+            padding: 10px 20px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 600;
+            box-shadow: 0 4px 10px rgba(30, 129, 176, 0.4);
+            transition: background 0.3s ease, box-shadow 0.3s ease;
+            cursor: pointer;
+            border: none;
+            font-size: 0.95rem;
+            width: 100px;
+            text-align: center;
+        }
+
+        .btn:hover {
+            background: var(--btn-hover);
+            box-shadow: 0 6px 18px rgba(21, 93, 139, 0.6);
+        }
+
+        .btn.reject {
+            background: var(--reject);
+        }
+
+        .btn.reject:hover {
+            background: var(--reject-hover);
+        }
+        .action-buttons {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .action-buttons form {
+            margin: 0;
+        }
+        .btn:disabled,
+        .btn-reject:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            background: #cccccc;
+            box-shadow: none;
+        }
+
+        .btn:disabled:hover,
+        .btn-reject:disabled:hover {
+            background: #cccccc;
+            box-shadow: none;
+            transform: none;
+        }
+        table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0 12px;
+            margin-top: 10px;
+            table-layout: fixed;
+            word-wrap: break-word;
+        }
+
+        thead tr {
+            background: var(--blue-light);
+            color: var(--blue-dark);
+            font-weight: 700;
+            text-align: left;
+            border-radius: 12px;
+        }
+
+        thead th,
+        tbody td {
+            padding: 12px 14px;
+            font-size: 0.9rem;
+            overflow-wrap: break-word;
+            white-space: normal;
+        }
+
+        tbody tr {
+            background: white;
+            box-shadow: 0 3px 10px rgba(14, 56, 101, 0.1);
+            border-radius: 12px;
+            transition: transform 0.2s ease;
+        }
+
+        tbody tr:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(14, 56, 101, 0.18);
+        }
+
+        thead th:nth-child(3),
+        tbody td:nth-child(3),
+        thead th:nth-child(4),
+        tbody td:nth-child(4),
+        thead th:nth-child(5),
+        tbody td:nth-child(5) {
+            min-width: 120px;
+            max-width: 200px;
+        }
+
+        thead th:last-child,
+        tbody td:last-child {
+            min-width: 160px;
+            max-width: 180px;
+        }
+
+
+    </style>
+</head>
+<body>
+<div class="container">
+    <h2>Одобрени/неодобрени задания за твоята катедра</h2>
+
+    <a href="/assignments" class="btn">Назад</a>
+
+    <table>
+        <thead>
+        <tr>
+            <th>Студент</th>
+            <th>Ръководител</th>
+            <th>Тема</th>
+            <th>Цел</th>
+            <th>Задачи</th>
+            <th>Технологии</th>
+            <th>Одобрена</th>
+            <th th:if="${showButtons}">Действия</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="a : ${assignments}">
+            <td th:text="${a.student.user.firstName + ' ' + a.student.user.lastName}"></td>
+            <td th:text="${a.supervisor.user.firstName + ' ' + a.supervisor.user.lastName}"></td>
+            <td th:text="${a.topic}"></td>
+            <td th:text="${a.goal}"></td>
+            <td th:text="${a.tasks}"></td>
+            <td th:text="${a.technologies}"></td>
+            <td th:text="${a.departmentApproved ? 'Да' : 'Не'}"></td>
+
+            <td th:if="${showButtons}">
+                <div class="action-buttons">
+                    <form th:action="@{/assignments/approval}" method="post">
+                        <input type="hidden" name="assignmentId" th:value="${a.id}" />
+                        <input type="hidden" name="action" value="approve" />
+                        <button type="submit" class="btn" th:disabled="${a.departmentApproved}">Одобри</button>
+                    </form>
+                    <form th:action="@{/assignments/approval}" method="post">
+                        <input type="hidden" name="assignmentId" th:value="${a.id}" />
+                        <input type="hidden" name="action" value="reject" />
+                        <button type="submit" class="btn reject" th:disabled="${a.departmentApproved}">Откажи</button>
+                    </form>
+                </div>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+</body>
+</html>

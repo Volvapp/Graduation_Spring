@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8" />
+    <title>Информация за защита</title>
+    <style>
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #e0f3ff, #f9fbff);
+            color: #222;
+            margin: 20px;
+            line-height: 1.5;
+        }
+        .container {
+            max-width: 980px;
+            margin: auto;
+            background: #fff;
+            border-radius: 12px;
+            box-shadow: 0 10px 25px rgba(0, 100, 200, 0.12);
+            padding: 30px 40px;
+        }
+
+
+        h2 {
+            color: #004080;
+            font-weight: 700;
+            font-size: 2rem;
+            text-align: center;
+            margin-bottom: 30px;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+        }
+
+
+        .info, .grade {
+            padding: 16px 20px;
+            border-radius: 8px;
+            margin-top: 25px;
+            font-size: 1rem;
+            font-weight: 600;
+            user-select: none;
+        }
+        .info {
+            background-color: #d3e9ff;
+            border-left: 5px solid #0080ff;
+            color: #0059b3;
+        }
+
+
+        /* Таблици */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 30px;
+            font-size: 1rem;
+        }
+        th, td {
+            padding: 14px 18px;
+            border-bottom: 1px solid #dce6f1;
+            text-align: left;
+            color: #33475b;
+        }
+        th {
+            background-color: #f0f7ff;
+            color: #004080;
+            letter-spacing: 0.03em;
+        }
+        tbody tr:hover {
+            background-color: #f5fbff;
+            transition: background-color 0.3s ease;
+        }
+
+        /* Бутон */
+        .btn {
+            display: inline-block;
+            background-color: #007acc;
+            color: #fff;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 1rem;
+            transition: background-color 0.25s ease;
+            user-select: none;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+        }
+        .btn:hover, .btn:focus {
+            background-color: #005fa3;
+            outline: none;
+        }
+        .btn:active {
+            background-color: #004080;
+        }
+
+        /* Вход за оценка */
+        .grade-input {
+            width: 70px;
+            padding: 8px 10px;
+            font-size: 1rem;
+            border: 1.8px solid #a0c4ff;
+            border-radius: 6px;
+            text-align: center;
+            transition: border-color 0.3s ease;
+            outline-offset: 2px;
+        }
+        .grade-input:focus {
+            border-color: #007acc;
+            outline: none;
+            box-shadow: 0 0 5px rgba(0, 122, 204, 0.6);
+        }
+
+        /* Дата и групи */
+        .defense-group {
+            background-color: #f7fbff;
+            border-radius: 12px;
+            padding: 22px 28px;
+            margin-bottom: 30px;
+            box-shadow: inset 0 0 12px #e4f1ff;
+            border: 1px solid #c6dbff;
+        }
+        .date-header {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: #005f9e;
+            margin-bottom: 16px;
+        }
+
+        /* Линк бутон Начало */
+        a.btn {
+            margin-bottom: 28px;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        /* Мобилна адаптация */
+        @media (max-width: 650px) {
+            .container {
+                padding: 20px;
+            }
+            table, th, td {
+                font-size: 0.9rem;
+            }
+            .btn {
+                font-size: 0.9rem;
+                padding: 8px 14px;
+            }
+            .grade-input {
+                width: 60px;
+                padding: 6px 8px;
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <a href="/" class="btn">Начало</a>
+
+    <!-- STUDENT VIEW -->
+    <div th:if="${isStudent}">
+        <h2>Моята защита</h2>
+
+        <div th:if="${student.assignment == null or student.assignment.thesis == null or student.assignment.thesis.review == null}" class="info">
+            Трябва ти положителна оценка от рецензията, за да ти бъде назначена защита.
+        </div>
+
+        <div th:unless="${student.assignment == null or student.assignment.thesis == null or student.assignment.thesis.review == null}">
+            <p><strong>Дата на защита:</strong>
+                <span th:if="${student.defense != null and student.defense.defenseDate != null}"
+                      th:text="${student.defense.defenseDate}"></span>
+                <span th:if="${student.defense == null or student.defense.defenseDate == null}">Още няма определена дата</span>
+            </p>
+
+            <p><strong>Преподаватели:</strong>
+                <span th:if="${student.defense != null}">
+                    <span th:each="teacher, iterStat : ${student.defense.committeeMembers}">
+                        <span th:text="${teacher.user.firstName + ' ' + teacher.user.lastName}"></span><span th:if="${!iterStat.last}">, </span>
+                    </span>
+                </span>
+                <span th:if="${student.defense == null}">Няма назначени преподаватели</span>
+            </p>
+
+            <form th:if="${canParticipate}" th:action="@{/students/defend}" method="post">
+                <input type="hidden" name="studentId" th:value="${student.id}" />
+                <button type="submit" class="btn">Участвам в защита</button>
+            </form>
+
+            <!-- Ако вече е участвал, но няма оценка -->
+            <p th:if="${student.hasParticipated and student.grade == null}" class="info" style="font-weight: 600;">
+                Очаквай оценка скоро!
+            </p>
+
+
+            <p th:if="${student.grade != null}" class="grade">
+                Защитена дипломна работа. Оценка: <span th:text="${student.grade}"></span>
+            </p>
+        </div>
+    </div>
+
+    <!-- TEACHER VIEW -->
+    <div th:if="${isTeacher}">
+        <h2>Назначени защити</h2>
+
+        <div th:if="${#lists.isEmpty(teacher.defenses)}" class="info">
+            Няма защити за показване.
+        </div>
+
+        <div th:each="defense : ${teacher.defenses}" class="defense-group">
+            <div class="date-header">
+                Дата:
+                <span th:if="${defense.defenseDate != null}" th:text="${defense.defenseDate}"></span>
+                <span th:if="${defense.defenseDate == null}">(няма определена дата)</span>
+            </div>
+
+            <form th:if="${defense.defenseDate == null}" th:action="@{/teachers/set-defense-date}" method="post">
+                <input type="hidden" name="defenseId" th:value="${defense.id}" />
+                <label for="defenseDate" style="font-weight: 600; margin-right: 8px;">Избери дата:</label>
+                <input type="date" id="defenseDate" name="defenseDate" required />
+                <button type="submit" class="btn">Запази</button>
+            </form>
+            <div th:if="${error}" style="color: red; font-weight: 600; margin-bottom: 20px;">
+                <p th:text="${error}"></p>
+            </div>
+            <table>
+                <thead>
+                <tr>
+                    <th>Студент</th>
+                    <th>Оценка</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="student : ${defense.students}">
+                    <td th:text="${student.user.firstName + ' ' + student.user.lastName}"></td>
+                    <td>
+                        <form th:if="${student.hasParticipated and student.grade == null and defense.defenseDate != null and
+                                     (defense.defenseDate.isBefore(T(java.time.LocalDate).now()) or
+                                      defense.defenseDate.equals(T(java.time.LocalDate).now()))}"
+                              th:action="@{/teachers/grade}" method="post" style="display: flex; align-items: center; gap: 10px;">
+                            <input type="hidden" name="studentId" th:value="${student.id}" />
+                            <input type="number" min="2" max="6" step="0.1" name="grade" class="grade-input" placeholder="2-6" required />
+                            <button type="submit" class="btn" style="padding: 6px 14px;">Оцени</button>
+                        </form>
+                        <span th:if="${student.grade != null}" class="grade"
+                              th:text="${student.grade}"></span>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+</body>
+</html>

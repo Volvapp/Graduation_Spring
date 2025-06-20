@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="bg" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Преподаватели</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #121c2b;
+            color: #f1f3f5;
+            padding: 2rem;
+        }
+
+        h2 {
+            margin-bottom: 1rem;
+            color: #4dabf7;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: #1f2d3d;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+        }
+
+        th, td {
+            padding: 1rem;
+            text-align: left;
+            border-bottom: 1px solid #2a3b50;
+        }
+
+        th {
+            background-color: #1a2636;
+            color: #4dabf7;
+            font-size: 1.1rem;
+        }
+
+        tr:hover {
+            background-color: #263b54;
+        }
+
+        /* Стил за бутона */
+        .btn {
+            display: inline-block;
+            background-color: #4dabf7;
+            color: #121c2b;
+            padding: 0.5rem 1.2rem;
+            border-radius: 5px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: background-color 0.3s ease;
+            margin-bottom: 1.5rem;
+        }
+
+        .btn:hover {
+            background-color: #3a8dde;
+        }
+    </style>
+</head>
+<body>
+
+<h2>Списък с преподаватели</h2>
+
+<a href="/" class="btn">Начало</a>
+
+<table>
+    <thead>
+    <tr>
+        <th>Име</th>
+        <th>Департамент</th>
+        <th>Позиция</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="teacher : ${teachers}">
+        <td th:text="${teacher.user.firstName + ' ' + teacher.user.lastName}">Име</td>
+        <td th:text="${teacher.user.department}">Департамент</td>
+        <td th:text="${teacher.position}">Позиция</td>
+    </tr>
+    </tbody>
+</table>
+
+</body>
+</html>

@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="bg">
+<head>
+    <meta charset="UTF-8">
+    <title>Регистрация</title>
+    <style>
+        :root {
+            --dark-blue: #0a2540;
+            --medium-blue: #15477a;
+            --light-blue: #2a6fcb;
+            --accent-blue: #3ca0f0;
+            --error-red: #e04f5f;
+            --text-light: #e0e7ff;
+            --input-bg: #1c355a;
+            --input-border: #2a6fcb;
+            --input-focus: #3ca0f0;
+            --shadow: rgba(0, 0, 0, 0.4);
+        }
+
+        *,
+        *::before,
+        *::after {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+            background: var(--dark-blue);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color: var(--text-light);
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            padding: 40px 20px;
+        }
+
+        .register-container {
+            background: var(--medium-blue);
+            border-radius: 12px;
+            padding: 2.5rem 3rem;
+            max-width: 480px;
+            width: 100%;
+            box-shadow: 0 8px 24px var(--shadow);
+        }
+
+        h2 {
+            margin-top: 0;
+            margin-bottom: 1.8rem;
+            color: var(--accent-blue);
+            font-weight: 700;
+            text-align: center;
+            letter-spacing: 1.2px;
+        }
+
+        form {
+            display: flex;
+            flex-direction: column;
+            gap: 1.2rem;
+        }
+
+        label {
+            font-weight: 600;
+            font-size: 0.95rem;
+            margin-bottom: 0.3rem;
+            display: block;
+        }
+
+        input[type="text"],
+        input[type="password"],
+        select {
+            width: 100%;
+            padding: 0.55rem 0.9rem;
+            border-radius: 8px;
+            border: 2px solid var(--input-border);
+            background-color: var(--input-bg);
+            color: var(--text-light);
+            font-size: 1rem;
+            transition: border-color 0.3s ease;
+            outline-offset: 2px;
+        }
+
+        input[type="text"]::placeholder,
+        input[type="password"]::placeholder {
+            color: #a0a8c0;
+        }
+
+        input[type="text"]:focus,
+        input[type="password"]:focus,
+        select:focus {
+            border-color: var(--input-focus);
+            outline: none;
+        }
+
+        select {
+            appearance: none;
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            background-image: url("data:image/svg+xml;charset=US-ASCII,%3csvg xmlns='http://www.w3.org/2000/svg' width='14' height='10'%3e%3cpath fill='%23e0e7ff' d='M7 10L0 0h14z'/%3e%3c/svg%3e");
+            background-repeat: no-repeat;
+            background-position: right 0.9rem center;
+            background-size: 12px 8px;
+            cursor: pointer;
+        }
+
+        input[type="submit"] {
+            margin-top: 1.4rem;
+            padding: 0.75rem;
+            font-size: 1.1rem;
+            font-weight: 700;
+            border-radius: 10px;
+            border: none;
+            background: var(--accent-blue);
+            color: var(--text-light);
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            box-shadow: 0 4px 12px rgba(60, 160, 240, 0.6);
+        }
+
+        input[type="submit"]:hover {
+            background-color: #1e90ff;
+            box-shadow: 0 6px 18px rgba(60, 160, 240, 0.85);
+        }
+
+        .form-text {
+            font-size: 0.85rem;
+            margin-top: 0.25rem;
+            color: var(--error-red);
+            background: rgba(224, 79, 95, 0.15);
+            padding: 0.3rem 0.6rem;
+            border-radius: 5px;
+        }
+
+        .bg-danger {
+            background-color: rgba(224, 79, 95, 0.8);
+            color: var(--text-light);
+            padding: 0.8rem 1rem;
+            font-weight: 700;
+            border-radius: 8px;
+            text-align: center;
+            margin-bottom: 1rem;
+        }
+
+        .message {
+            text-align: center;
+            margin-top: 1rem;
+            color: var(--error-red);
+            font-weight: 600;
+        }
+
+        .back-link {
+            display: block;
+            margin-top: 1.5rem;
+            text-align: center;
+            color: #9ab7ff;
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 0.95rem;
+            transition: color 0.3s ease;
+        }
+
+        .back-link:hover {
+            color: var(--accent-blue);
+        }
+
+    </style>
+</head>
+<body>
+
+<div class="register-container">
+    <h2>Създай профил</h2>
+    <form th:action="@{/users/register}" method="post" th:object="${UserDTO}">
+        <p th:if="${isUserOrEmailOccupied}" class="bg-danger text-light font-weight-bold p-2 rounded">
+            Потребителското име или имейлът вече съществуват.
+        </p>
+
+        <label for="username">Потребителско име</label>
+        <input type="text" id="username" th:field="*{username}" />
+        <small th:if="${#fields.hasErrors('username')}" th:errors="*{username}"
+               class="form-text bg-danger rounded text-light p-1"></small>
+
+        <label for="email">Имейл</label>
+        <input type="text" id="email" th:field="*{email}" />
+        <small th:if="${#fields.hasErrors('email')}" th:errors="*{email}"
+               class="form-text bg-danger rounded text-light p-1"></small>
+
+        <label for="firstName">Име</label>
+        <input type="text" id="firstName" th:field="*{firstName}" />
+        <small th:if="${#fields.hasErrors('firstName')}" th:errors="*{firstName}"
+               class="form-text bg-danger rounded text-light p-1"></small>
+
+        <label for="lastName">Фамилия</label>
+        <input type="text" id="lastName" th:field="*{lastName}" />
+        <small th:if="${#fields.hasErrors('lastName')}" th:errors="*{lastName}"
+               class="form-text bg-danger rounded text-light p-1"></small>
+
+        <label for="password">Парола</label>
+        <input type="password" id="password" th:field="*{password}" />
+        <small th:if="${#fields.hasErrors('password')}" th:errors="*{password}"
+               class="form-text bg-danger rounded text-light p-1"></small>
+
+        <label for="confirmPassword">Потвърди паролата</label>
+        <input type="password" id="confirmPassword" th:field="*{confirmPassword}" />
+        <small th:if="${#fields.hasErrors('confirmPassword')}" th:errors="*{confirmPassword}"
+               class="form-text bg-danger rounded text-light p-1"></small>
+
+        <label for="role">Роля</label>
+        <select id="role" th:field="*{role}">
+            <option value="STUDENT">Студент</option>
+            <option value="TEACHER">Преподавател</option>
+        </select>
+
+        <label for="department">Департамент</label>
+        <select id="department" th:field="*{department}">
+            <option th:each="dept : ${T(com.nbu.graduation.spring.model.enums.Department).values()}"
+                    th:value="${dept}" th:text="${dept.displayName}">Department</option>
+        </select>
+
+        <input type="submit" value="Регистрация" />
+    </form>
+
+    <div class="message" th:if="${param.error}">
+        Грешка при регистрацията. Опитай отново.
+    </div>
+
+    <a class="back-link" th:href="@{/}">Обратно към началната страница</a>
+</div>
+
+</body>
+</html>
