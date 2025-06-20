@@ -47,4 +47,4 @@ The system supports two roles:
 
 ## Technical Requirements
 
-The application is developed as a Spring Boot web application based on RESTful web services with a database and user interface. It must provide functionality for creating, editing, deleting, and displaying data as described. Data validation, exception handling, testing, and user management should be implemented.
+The application is developed as a Spring Boot web application based on RESTful web services with a database and user interface using HTML & CSS. It must provide functionality for creating, editing, deleting, and displaying data as described. Data validation, exception handling, testing, and user management should be implemented.
